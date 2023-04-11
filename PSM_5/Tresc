@@ -1,0 +1,13 @@
+﻿Zadanie 5
+Wykreślić trajektorię księżyca względem słońca rozwiązując odpowiednio równania opisujące ruch 
+Ziemi wokół słońca oraz Księżyca względem Ziemi
+Na potrzeby rozwiązania przyjmujemy, że Ziemia porusza się po orbicie kołowej, Księżyc względem 
+Ziemi porusza się po orbicie kołowej.
+Przyjmujemy
+𝐺 = 6,6743 ∙ 10−11 [𝑁𝑚^2/𝑘𝑔^2] - stała grawitacyjna
+𝑀𝑠 = 1,989 ∙ 1030𝑘𝑔 – masa Słońca
+𝑀𝑧 = 5,972 ∙ 1024𝑘𝑔 – masa Ziemi
+𝑀𝑘 = 7,347 ∙ 1022 – masa Księżyca
+𝑅𝑍𝑆 = 1,5 ∙ 108𝑘𝑚 – odległość Ziemia Słońce
+𝑅𝑍𝐾 = 384400 𝑘𝑚 – odległość Ziemia Księżyc
+Równania ruchu rozwiązać wykorzystując ulepszoną metodę Eulera (MidPoint)
