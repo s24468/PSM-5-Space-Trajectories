@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
+﻿using System.Windows;
+using LiveCharts;
+using LiveCharts.Defaults;
+using LiveCharts.Wpf;
 namespace PSM_5
 {
     /// <summary>
@@ -23,6 +12,27 @@ namespace PSM_5
         public MainWindow()
         {
             InitializeComponent();
+            var chart = new ChartValues<ObservablePoint>()
+            {
+                new ObservablePoint(1, 2),
+                new ObservablePoint(3, 4),
+                new ObservablePoint(8, 1)
+            };
+            var line = new LineSeries()
+            {
+                Title = "Jarek",
+                Values = chart
+            };
+            var seria = new SeriesCollection();
+            seria.Add(line);
+            var cartesianChart = new CartesianChart()
+            {
+                Series = seria
+            };
+            Content = cartesianChart;
+
+
+
         }
     }
 }
