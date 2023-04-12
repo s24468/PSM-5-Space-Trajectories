@@ -12,7 +12,8 @@ namespace PSM_5
     /// </summary>
     public partial class MainWindow : Window
     {
-        const int NUMSTEPS = 400;
+        const int NUMSTEPS = 365 * 3; // 3 lata
+        const double DT = 86400; //jeden dzien
 
         public MainWindow()
         {
@@ -23,7 +24,7 @@ namespace PSM_5
             double Mm = 7.347e+22;
             double Des = 1.5e+11;
             double Dem = 384400000;
-            double dt = 21600;
+            double dt = DT;
             double Ve = 29749.15427;
             double Vm = 1018.289046;
 
@@ -92,7 +93,7 @@ namespace PSM_5
                 VxM += DVxM;
                 VyM += DVyM;
                 chart.Add(new ObservablePoint(Xm + list[i], Ym + list[i + 1]));
-                chart2.Add(new ObservablePoint(list[i], list[i + 1]));
+                // chart2.Add(new ObservablePoint(list[i], list[i + 1]));
                 // chart.Add(new ObservablePoint(list[i], list[i + 1]));
                 i += 2;
                 // Wypisanie wyników dla kroku t (opcjonalne)
@@ -104,17 +105,10 @@ namespace PSM_5
             {
                 Title = "KSIEZYC",
                 Values = chart,
-                // PointGeometry = null // Usuwa punkty z wykresu
-            };
-            var ziemiaSeries = new LineSeries()
-            {
-                Title = "ZIEMIA",
-                Values = chart,
-                // PointGeometry = null // Usuwa punkty z wykresu
+                PointGeometry = null // Usuwa punkty z wykresu
             };
             var seria = new SeriesCollection();
             seria.Add(ksiezycSeries);
-            seria.Add(ziemiaSeries);
             var cartesianChart = new CartesianChart()
             {
                 Series = seria,
@@ -130,7 +124,7 @@ namespace PSM_5
             double Ms = 1.989e+30;
             double Me = 5.972e+24;
             double Des = 1.5e+11;
-            double dt = 21600;
+            double dt = DT;
             double Xs = 0;
             double Ys = 0;
             double Ve = 29749.15427;
@@ -172,18 +166,9 @@ namespace PSM_5
                 VxE += DVxE;
                 VyE += DVyE;
 
-                // Wyświetlanie wyników
-                Console.WriteLine($"Krok {t + 1}:");
-                Console.WriteLine($"Xe: {Xe}");
-                Console.WriteLine($"Ye: {Ye}");
-                Console.WriteLine($"VxE: {VxE}");
-                Console.WriteLine($"DVyE: {DVyE}");
-                Console.WriteLine($"AyE_2: {AyE_2}");
-                Console.WriteLine($"Fy_2: {Fy_2}");
 
-
-                list.Add(Xs / 10);
-                list.Add(Ys / 10);
+                list.Add(Xe / 10);
+                list.Add(Ye / 10);
             }
 
 
