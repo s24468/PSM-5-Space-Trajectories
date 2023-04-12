@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
@@ -10,105 +9,89 @@ namespace PSM_5
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        const int NUMSTEPS = 365 * 3; // 3 lata
-        const double DT = 86400; //jeden dzien
+        const int Numsteps = 365 * 3; // 3 lata
+        const double Dt = 86400; //jeden dzien
+        private const double GravityConstant = 6.6743e-11;
+        const double SunMass = 1.989e+30;
+        const double EarthMass = 5.972e+24;
+        const double MoonMass = 7.347e+22;
 
         public MainWindow()
         {
             // Stałe
-            double G = 6.6743e-11;
-            double Ms = 1.989e+30;
-            double Me = 5.972e+24;
-            double Mm = 7.347e+22;
-            double Des = 1.5e+11;
-            double Dem = 384400000;
-            double dt = DT;
-            double Ve = 29749.15427;
-            double Vm = 1018.289046;
+            double DistanceEarthSun = 1.5e+11;
+            double DistanceEarthMoon = 384400000;
+            double velocityEarth = 29749.15427;
+            double velocityMoon = 1018.289046;
 
             // Zmienne
-            double Xm,
-                Ym,
-                VxM,
-                VyM,
-                F,
-                FxM,
-                FyM,
-                AxM,
-                AyM,
-                Xm_2,
-                Ym_2,
-                Fx_2,
-                Fy_2,
-                VxM_2,
-                VyM_2,
-                AxM_2,
-                AyM_2,
-                DxM,
-                DyM,
-                DVxM,
-                DVyM;
+            double xAccelerationMoon, yAccelerationMoon;
+            double forceGravity, xForceGravity, yForceGravity;
+            double Xm_2, Ym_2;
+            double Fx_2, Fy_2;
+            double VxM_2, VyM_2;
+            double AxM_2, AyM_2;
+            double DxM, DyM;
+            double DVxM, DVyM;
 
-            // Przykładowa liczba kroków
-            int numSteps = NUMSTEPS;
+            // liczba kroków
+            int numSteps = Numsteps;
 
             // Współrzędne początkowe
-            double Xe = 0, Ye = 0;
-            Xm = Xe;
-            Ym = Ye + Dem;
-            VxM = Vm;
-            VyM = 0;
+            double xCoordinatesEarth = 0, yCoordinatesEarth = 0;
+            var xCoordinatesMoon = xCoordinatesEarth;
+            var yCoordinatesMoon = yCoordinatesEarth + DistanceEarthMoon;
+            var xVelocityMoon = velocityMoon;
+            double yVelocityMoon = 0;
+            
+            
             InitializeComponent();
             var chart = new ChartValues<ObservablePoint>();
-            var chart2 = new ChartValues<ObservablePoint>();
-            var list = ZiemiaList();
+            var list = EarthList();
             int i = 0;
             for (int t = 0; t < numSteps; t++)
             {
                 // Obliczenia dla kroku t
-                Dem = Math.Sqrt(Math.Pow(Xe - Xm, 2) + Math.Pow(Ye - Ym, 2));
-                F = G * Me * Mm / Math.Pow(Dem, 2);
-                FxM = (Xe - Xm) / Dem * F;
-                FyM = (Ye - Ym) / Dem * F;
-                AxM = FxM / Mm;
-                AyM = FyM / Mm;
-                Xm_2 = Xm + VxM * dt / 2;
-                Ym_2 = Ym + VyM * dt / 2;
-                Fx_2 = (Xe - Xm_2) / Dem * F;
-                Fy_2 = (Ye - Ym_2) / Dem * F;
-                VxM_2 = VxM + AxM * dt / 2;
-                VyM_2 = VyM + AyM * dt / 2;
-                AxM_2 = Fx_2 / Mm;
-                AyM_2 = Fy_2 / Mm;
-                DxM = VxM_2 * dt;
-                DyM = VyM_2 * dt;
-                DVxM = AxM_2 * dt;
-                DVyM = AyM_2 * dt;
+                DistanceEarthMoon = Math.Sqrt(Math.Pow(xCoordinatesEarth - xCoordinatesMoon, 2) +
+                                              Math.Pow(yCoordinatesEarth - yCoordinatesMoon, 2));
+                forceGravity = GravityConstant * EarthMass * MoonMass / Math.Pow(DistanceEarthMoon, 2);
+                xForceGravity = (xCoordinatesEarth - xCoordinatesMoon) / DistanceEarthMoon * forceGravity;
+                yForceGravity = (yCoordinatesEarth - yCoordinatesMoon) / DistanceEarthMoon * forceGravity;
+                xAccelerationMoon = xForceGravity / MoonMass;
+                yAccelerationMoon = yForceGravity / MoonMass;
+                Xm_2 = xCoordinatesMoon + xVelocityMoon * Dt / 2;
+                Ym_2 = yCoordinatesMoon + yVelocityMoon * Dt / 2;
+                Fx_2 = (xCoordinatesEarth - Xm_2) / DistanceEarthMoon * forceGravity;
+                Fy_2 = (yCoordinatesEarth - Ym_2) / DistanceEarthMoon * forceGravity;
+                VxM_2 = xVelocityMoon + xAccelerationMoon * Dt / 2;
+                VyM_2 = yVelocityMoon + yAccelerationMoon * Dt / 2;
+                AxM_2 = Fx_2 / MoonMass;
+                AyM_2 = Fy_2 / MoonMass;
+                DxM = VxM_2 * Dt;
+                DyM = VyM_2 * Dt;
+                DVxM = AxM_2 * Dt;
+                DVyM = AyM_2 * Dt;
 
                 // Aktualizacja zmiennych
-                Xm += DxM;
-                Ym += DyM;
-                VxM += DVxM;
-                VyM += DVyM;
-                chart.Add(new ObservablePoint(Xm + list[i], Ym + list[i + 1]));
-                // chart2.Add(new ObservablePoint(list[i], list[i + 1]));
-                // chart.Add(new ObservablePoint(list[i], list[i + 1]));
+                xCoordinatesMoon += DxM;
+                yCoordinatesMoon += DyM;
+                xVelocityMoon += DVxM;
+                yVelocityMoon += DVyM;
+                chart.Add(new ObservablePoint(xCoordinatesMoon + list[i], yCoordinatesMoon + list[i + 1]));
                 i += 2;
-                // Wypisanie wyników dla kroku t (opcjonalne)
-                // Console.WriteLine($"Krok {t}: Xm={Xm}, Ym={Ym}, VxM={VxM}, VyM={VyM}");
             }
 
-
-            var ksiezycSeries = new LineSeries()
+            //tworzenie wykresu
+            var moonSeries = new LineSeries()
             {
-                Title = "KSIEZYC",
+                Title = "Moon",
                 Values = chart,
                 PointGeometry = null // Usuwa punkty z wykresu
             };
             var seria = new SeriesCollection();
-            seria.Add(ksiezycSeries);
+            seria.Add(moonSeries);
             var cartesianChart = new CartesianChart()
             {
                 Series = seria,
@@ -117,58 +100,58 @@ namespace PSM_5
         }
 
 
-        private static List<double> ZiemiaList()
+        private static List<double> EarthList()
         {
             List<double> list = new List<double>();
-            double G = 6.6743e-11;
-            double Ms = 1.989e+30;
-            double Me = 5.972e+24;
-            double Des = 1.5e+11;
-            double dt = DT;
-            double Xs = 0;
-            double Ys = 0;
-            double Ve = 29749.15427;
+
+            double distanceEarthSun = 1.5e+11;
+            const double xCoordinatesSun = 0;
+            const double yCoordinatesSun = 0;
+            double velocityEarth = 29749.15427;
 
             // Inicjalizacja zmiennych
-            double Xe = Xs;
-            double Ye = Ys + Des;
-            double VxE = Ve;
-            double VyE = 0;
-            double F, FxE, FyE, AxE, AyE, Xe_2, Ye_2, Fx_2, Fy_2, VxE_2, VyE_2, AxE_2, AyE_2, DxE, DyE, DVxE, DVyE;
+            double xCoordinatesEarth = xCoordinatesSun;
+            double yCoordinatesEarth = yCoordinatesSun + distanceEarthSun;
+            double xVelocityEarth = velocityEarth;
+            double yVelocityEarth = 0;
 
-            int steps = NUMSTEPS; // liczba kroków czasowych (można dostosować)
 
-            for (int t = 0; t < steps; t++)
+            double Xe_2, Ye_2, Fx_2, Fy_2, VxE_2, VyE_2, AxE_2, AyE_2, DxE, DyE, DVxE, DVyE;
+
+            int steps = Numsteps; // liczba kroków czasowych (można dostosować)
+
+            for (int t = 0; t < steps; t++)//coordinates
             {
                 // Obliczenia dla kroku t
-                Des = Math.Sqrt(Math.Pow(Xe - Xs, 2) + Math.Pow(Ye - Ys, 2));
-                F = G * Ms * Me / Math.Pow(Des, 2);
-                FxE = (Xs - Xe) / Des * F;
-                FyE = (Ys - Ye) / Des * F;
-                AxE = FxE / Me;
-                AyE = FyE / Me;
-                Xe_2 = Xe + VxE * dt / 2;
-                Ye_2 = Ye + VyE * dt / 2;
-                Fx_2 = (Xs - Xe_2) / Des * F;
-                Fy_2 = (Ys - Ye_2) / Des * F;
-                VxE_2 = VxE + AxE * dt / 2;
-                VyE_2 = VyE + AyE * dt / 2;
-                AxE_2 = Fx_2 / Me;
-                AyE_2 = Fy_2 / Me;
-                DxE = VxE_2 * dt;
-                DyE = VyE_2 * dt;
-                DVxE = AxE_2 * dt;
-                DVyE = AyE_2 * dt;
+                distanceEarthSun = Math.Sqrt(Math.Pow(xCoordinatesEarth - xCoordinatesSun, 2) +
+                                             Math.Pow(yCoordinatesEarth - yCoordinatesSun, 2));
+                var forceGravity = GravityConstant * SunMass * EarthMass / Math.Pow(distanceEarthSun, 2);
+                var xForceGravity = (xCoordinatesSun - xCoordinatesEarth) / distanceEarthSun * forceGravity;
+                var yForceGravity = (yCoordinatesSun - yCoordinatesEarth) / distanceEarthSun * forceGravity;
+                var xAccelerationEarth = xForceGravity / EarthMass;
+                var yAccelerationEarth = yForceGravity / EarthMass;
+                Xe_2 = xCoordinatesEarth + xVelocityEarth * Dt / 2;
+                Ye_2 = yCoordinatesEarth + yVelocityEarth * Dt / 2;
+                Fx_2 = (xCoordinatesSun - Xe_2) / distanceEarthSun * forceGravity;
+                Fy_2 = (yCoordinatesSun - Ye_2) / distanceEarthSun * forceGravity;
+                VxE_2 = xVelocityEarth + xAccelerationEarth * Dt / 2;
+                VyE_2 = yVelocityEarth + yAccelerationEarth * Dt / 2;
+                AxE_2 = Fx_2 / EarthMass;
+                AyE_2 = Fy_2 / EarthMass;
+                DxE = VxE_2 * Dt;
+                DyE = VyE_2 * Dt;
+                DVxE = AxE_2 * Dt;
+                DVyE = AyE_2 * Dt;
 
                 // Aktualizacja zmiennych
-                Xe += DxE;
-                Ye += DyE;
-                VxE += DVxE;
-                VyE += DVyE;
+                xCoordinatesEarth += DxE;
+                yCoordinatesEarth += DyE;
+                xVelocityEarth += DVxE;
+                yVelocityEarth += DVyE;
 
 
-                list.Add(Xe / 10);
-                list.Add(Ye / 10);
+                list.Add(xCoordinatesEarth / 10);
+                list.Add(yCoordinatesEarth / 10);
             }
 
 
